@@ -1,0 +1,29 @@
+<!-- templates/confirmacao.html -->
+{% extends "base.html" %}
+{% block title %}Confirmação{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h3><i class="fa-solid fa-circle-check"></i> Recebemos sua reclamação!</h3>
+            </div>
+            
+            <div class="card-body py-5">
+                <div class="alert alert-primary protocolo-badge">
+                    Seu protocolo: <strong>{{ protocolo }}</strong>
+                </div>
+                
+                <p class="lead">Acompanhe o status pelo WhatsApp ou e-mail cadastrado.</p>
+                
+                <div class="mt-4">
+                    <a href="/" class="btn btn-primary">
+                        <i class="fa-solid fa-house"></i> Voltar à Página Inicial
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

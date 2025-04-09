@@ -1,0 +1,117 @@
+<!-- templates/admin.html -->
+{% extends "base.html" %}
+{% block title %}Painel Administrativo{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2><i class="fa-solid fa-gear"></i> Painel Administrativo</h2>
+        <a href="{{ url_for('logout') }}" class="btn btn-danger">
+            <i class="fa-solid fa-right-from-bracket"></i> Sair
+        </a>
+    </div>
+
+    <form class="row g-3 mt-2">
+        <div class="col-md-6">
+            <input type="text" name="search" class="form-control" 
+                   placeholder="Pesquisar..." value="{{ request.args.get('search', '') }}">
+        </div>
+        
+        <div class="col-md-3">
+            <select name="type" class="form-select">
+                <option value="protocolo" {% if request.args.get('type') == 'protocolo' %}selected{% endif %}>Protocolo</option>
+                <option value="nome" {% if request.args.get('type') == 'nome' %}selected{% endif %}>Nome</option>
+                <option value="data" {% if request.args.get('type') == 'data' %}selected{% endif %}>Data</option>
+            </select>
+        </div>
+        
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fa-solid fa-magnifying-glass"></i> Buscar
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="card shadow">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Protocolo</th>
+                        <th>Data/Hora</th>
+                        <th>Morador</th>
+                        <th>Localização</th>
+                        <th>Reclamação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    {% for reclamação in reclamacoes %}
+                    <tr>
+                        <td class="fw-bold">{{ reclamação.protocolo }}</td>
+                        <td>{{ reclamação.data_hora.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>
+                            {{ reclamação.nome }}<br>
+                            <small class="text-muted">{{ reclamação.email }}</small>
+                        </td>
+                        <td>Torre {{ reclamação.torre }} - Apt {{ reclamação.apartamento }}</td>
+                        <td class="text-truncate" style="max-width: 250px;">{{ reclamação.reclamacao }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" type="button" 
+                                    data-bs-toggle="collapse" data-bs-target="#resp{{ reclamação.id }}">
+                                <i class="fa-solid fa-comment-dots"></i>
+                            </button>
+                            
+                            {% if reclamação.foto %}
+                            <a href="{{ url_for('static', filename='uploads/' + reclamação.foto) }}" 
+                               class="btn btn-sm btn-outline-success" target="_blank">
+                                <i class="fa-solid fa-image"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    
+                    <tr class="collapse" id="resp{{ reclamação.id }}">
+                        <td colspan="6">
+                            <form method="POST" action="{{ url_for('responder', id=reclamação.id) }}">
+                                <div class="input-group mb-3">
+                                    <textarea name="resposta" class="form-control" 
+                                              placeholder="Digite a resposta..." rows="3" required>{{ reclamação.resposta or '' }}</textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="metodo" value="email" id="email{{ reclamação.id }}">
+                                        <label class="form-check-label" for="email{{ reclamação.id }}">
+                                            <i class="fa-solid fa-envelope"></i> Enviar por E-mail
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="metodo" value="whatsapp" id="whatsapp{{ reclamação.id }}">
+                                        <label class="form-check-label" for="whatsapp{{ reclamação.id }}">
+                                            <i class="fa-brands fa-whatsapp"></i> Enviar por WhatsApp
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa-solid fa-paper-plane"></i> Enviar Resposta
+                                    </button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
